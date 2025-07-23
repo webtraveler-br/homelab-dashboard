@@ -1,0 +1,94 @@
+env_file: ../.env
+
+services:
+    postgres:
+        image: postgres:15
+        container_name: postgres
+        restart: always
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        ports:
+            - '5432:5432'
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        networks:
+            - homelab_net
+
+    rabbitmq:
+        image: rabbitmq:3-management
+        container_name: rabbitmq
+        restart: always
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+        networks:
+            - homelab_net
+
+    mosquitto:
+        image: eclipse-mosquitto:2
+        container_name: mosquitto
+        restart: always
+        ports:
+            - '1883:1883'
+            - '9001:9001'
+        volumes:
+            - mosquitto_data:/mosquitto/data
+            - ./mosquitto/config:/mosquitto/config
+        networks:
+            - homelab_net
+
+    # cat_ingestor:
+    #   build: ../homelab-gatos-iot/services/cat_ingestor
+    #   container_name: cat_ingestor
+    #   depends_on:
+    #     - mosquitto
+    #     - postgres
+    #   environment:
+    #     - MQTT_BROKER=mosquitto
+    #     - POSTGRES_HOST=postgres
+    #     - POSTGRES_DB=${POSTGRES_DB}
+    #     - POSTGRES_USER=${POSTGRES_USER}
+    #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    #   networks:
+    #     - homelab_net
+
+    # backend:
+    #   build: ./backend
+    #   container_name: backend
+    #   depends_on:
+    #     - postgres
+    #     - rabbitmq
+    #   environment:
+    #     - DB_HOST=postgres
+    #     - DB_DATABASE=${POSTGRES_DB}
+    #     - DB_USERNAME=${POSTGRES_USER}
+    #     - DB_PASSWORD=${POSTGRES_PASSWORD}
+    #     - RABBITMQ_HOST=rabbitmq
+    #   ports:
+    #     - "8000:8000"
+    #   networks:
+    #     - homelab_net
+
+    # frontend:
+    #   build: ./frontend
+    #   container_name: frontend
+    #   depends_on:
+    #     - backend
+    #   ports:
+    #     - "8080:8080"
+    #   networks:
+    #     - homelab_net
+
+volumes:
+    pgdata:
+    mosquitto_data:
+    mosquitto_config:
+
+networks:
+    homelab_net:
+        driver: bridge
