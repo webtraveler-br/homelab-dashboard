@@ -9,6 +9,7 @@ services:
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
             POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_HOST: ${POSTGRES_HOST}
         ports:
             - '5432:5432'
         volumes:
@@ -42,20 +43,23 @@ services:
         networks:
             - homelab_net
 
-    # cat_ingestor:
-    #   build: ../homelab-gatos-iot/services/cat_ingestor
-    #   container_name: cat_ingestor
-    #   depends_on:
-    #     - mosquitto
-    #     - postgres
-    #   environment:
-    #     - MQTT_BROKER=mosquitto
-    #     - POSTGRES_HOST=postgres
-    #     - POSTGRES_DB=${POSTGRES_DB}
-    #     - POSTGRES_USER=${POSTGRES_USER}
-    #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    #   networks:
-    #     - homelab_net
+    cat_ingestor:
+      build: ../homelab-gatos-iot/services/cat_ingestor
+      container_name: cat_ingestor
+      depends_on:
+        - mosquitto
+        - postgres
+      environment:
+        - MQTT_BROKER=${MQTT_BROKER}
+        - MQTT_BROKER_HOST=${MQTT_BROKER_HOST}
+        - MQTT_BROKER_PORT=${MQTT_BROKER_PORT}
+        - MQTT_TOPIC=${MQTT_TOPIC}
+        - POSTGRES_HOST=${POSTGRES_HOST}
+        - POSTGRES_DB=${POSTGRES_DB}
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      networks:
+        - homelab_net
 
     # backend:
     #   build: ./backend
