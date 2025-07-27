@@ -1,10 +1,10 @@
-env_file: ../.env
-
 services:
     postgres:
         image: postgres:15
         container_name: postgres
         restart: always
+        env_file:
+            - ../.env
         environment:
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -21,6 +21,8 @@ services:
         image: rabbitmq:3-management
         container_name: rabbitmq
         restart: always
+        env_file:
+            - ../.env
         ports:
             - '5672:5672'
             - '15672:15672'
@@ -49,17 +51,12 @@ services:
       depends_on:
         - mosquitto
         - postgres
-      environment:
-        - MQTT_BROKER=${MQTT_BROKER}
-        - MQTT_BROKER_HOST=${MQTT_BROKER_HOST}
-        - MQTT_BROKER_PORT=${MQTT_BROKER_PORT}
-        - MQTT_TOPIC=${MQTT_TOPIC}
-        - POSTGRES_HOST=${POSTGRES_HOST}
-        - POSTGRES_DB=${POSTGRES_DB}
-        - POSTGRES_USER=${POSTGRES_USER}
-        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      env_file:
+        - ../.env
       networks:
         - homelab_net
+      volumes:
+        - ./cat_ingestor_logs:/app/logs
 
     # backend:
     #   build: ./backend
@@ -67,6 +64,8 @@ services:
     #   depends_on:
     #     - postgres
     #     - rabbitmq
+    #   env_file:
+    #     - ../.env
     #   environment:
     #     - DB_HOST=postgres
     #     - DB_DATABASE=${POSTGRES_DB}
@@ -83,6 +82,8 @@ services:
     #   container_name: frontend
     #   depends_on:
     #     - backend
+    #   env_file:
+    #     - ../.env
     #   ports:
     #     - "8080:8080"
     #   networks:
