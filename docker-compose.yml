@@ -26,6 +26,11 @@ services:
         ports:
             - '5672:5672'
             - '15672:15672'
+        healthcheck:
+            test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+            interval: 10s
+            timeout: 5s
+            retries: 5
         networks:
             - homelab_net
 
@@ -36,6 +41,11 @@ services:
         ports:
             - '1883:1883'
             - '9001:9001'
+        healthcheck:
+            test: ['CMD-SHELL', 'mosquitto_sub -h localhost -t healthcheck -C 1 -E || exit 1']
+            interval: 10s
+            timeout: 5s
+            retries: 5
         volumes:
             - mosquitto_data:/mosquitto/data
             - ./mosquitto/config:/mosquitto/config
@@ -81,17 +91,28 @@ services:
         volumes:
             - ./backend:/var/www/html
 
-    # frontend:
-    #   build: ./frontend
-    #   container_name: frontend
-    #   depends_on:
-    #     - backend
-    #   env_file:
-    #     - ../.env
-    #   ports:
-    #     - "8080:8080"
-    #   networks:
-    #     - homelab_net
+    frontend:
+        build:
+            context: ./frontend
+            args:
+                APP_ENV: ${APP_ENV}
+                HOST_UID: ${HOST_UID}
+                HOST_GID: ${HOST_GID}
+        container_name: frontend
+        depends_on:
+            - backend
+        env_file:
+            - .env
+        environment:
+            APP_ENV: ${APP_ENV}
+            HOST: '0.0.0.0'
+            PORT: '8080'
+        ports:
+            - '8080:8080'
+        networks:
+            - homelab_net
+        volumes:
+            - ./frontend:/app
 
 volumes:
     pgdata:
