@@ -80,7 +80,9 @@ services:
             - .env
         environment:
             APP_ENV: ${APP_ENV}
+            DB_CONNECTION: ${DB_CONNECTION}
             DB_HOST: ${POSTGRES_HOST}
+            DB_PORT: ${POSTGRES_PORT}
             DB_DATABASE: ${POSTGRES_DB}
             DB_USERNAME: ${POSTGRES_USER}
             DB_PASSWORD: ${POSTGRES_PASSWORD}

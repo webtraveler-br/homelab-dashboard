@@ -13,8 +13,8 @@ ARG HOST_UID=1000
 ARG HOST_GID=1000
 
 # Cria usuário/grupo com UID/GID do host
-RUN groupadd -g $HOST_GID www-data-host && \
-    useradd -u $HOST_UID -g $HOST_GID -m www-data-host
+RUN getent group $HOST_GID || groupadd -g $HOST_GID www-data-host; \
+    getent passwd $HOST_UID || useradd -u $HOST_UID -g $HOST_GID -m www-data-host
 
 # Copia apenas arquivos de dependência para otimizar cache
 COPY --chown=www-data-host:www-data-host composer.json composer.lock ./
@@ -32,7 +32,7 @@ RUN if [ "$APP_ENV" = "development" ]; then \
 
 EXPOSE 8000
 
-USER www-data-host
+USER $HOST_UID
 
-# CMD: servidor embutido em desenvolvimento, php-fpm em produção
-CMD ["sh", "-c", "if [ \"$APP_ENV\" = \"development\" ]; then php artisan serve --host=0.0.0.0 --port=8000; else php-fpm; fi"]
+# CMD: exibe variáveis de ambiente relevantes e inicia o serviço
+CMD ["sh", "-c", "echo \"APP_ENV=$APP_ENV\"; echo \"DB_CONNECTION=$DB_CONNECTION\"; echo \"DB_HOST=$DB_HOST\"; echo \"DB_PORT=$DB_PORT\"; echo \"DB_DATABASE=$DB_DATABASE\"; echo \"DB_USERNAME=$DB_USERNAME\"; echo \"DB_PASSWORD=$DB_PASSWORD\"; if [ \"$APP_ENV\" = \"development\" ]; then php artisan serve --host=0.0.0.0 --port=8000; else php-fpm; fi"]
