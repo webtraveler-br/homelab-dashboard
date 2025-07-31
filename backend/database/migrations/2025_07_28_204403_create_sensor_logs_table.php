@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sensor_logs', function (Blueprint $table) {
-            $table->id();
-            $table->timestampTz('timestamp')->useCurrent();
-            $table->string('topic', 255);
-            $table->json('payload');
-            $table->index(['timestamp'], 'idx_sensor_logs_timestamp');
-        });
+        if (!Schema::hasTable('sensor_logs')) {
+            Schema::create('sensor_logs', function (Blueprint $table) {
+                $table->id();
+                $table->timestampTz('timestamp')->useCurrent();
+                $table->string('topic', 255);
+                $table->json('payload');
+                $table->index(['timestamp'], 'idx_sensor_logs_timestamp');
+            });
 
-        \DB::statement('CREATE INDEX IF NOT EXISTS idx_sensor_logs_payload ON sensor_logs USING GIN (payload);');
+            \DB::statement('CREATE INDEX IF NOT EXISTS idx_sensor_logs_payload ON sensor_logs USING GIN (payload);');
+        }
     }
 
     /**
