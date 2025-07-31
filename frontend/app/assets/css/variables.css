@@ -1,22 +1,22 @@
 :root {
-	/* Cores*/
-	--color-primary: #3b82f6; /* Azul vibrante */
-	--color-primary-light: #93c5fd;
-	--color-secondary: #10b981; /* Verde para sucesso/status */
-	--color-accent: #8b5cf6; /* Roxo para detalhes de destaque */
+	/* Tema padrão: Claro */
+	--color-primary: #D9833B; 
+	--color-primary-light: #FADCB9;
+	--color-secondary: #B46A34; 
+	--color-accent: #D9833B; 
 	--color-danger: #ef4444;
 	--color-warning: #f59e0b;
 	
 	/* Cores de fundo e texto */
-	--color-background: #f9fafb;
+	--color-background: #F9F6F0;
 	--color-background-alt: #ffffff;
-	--color-text: #111827;
-	--color-text-muted: #6b7280;
+	--color-text: #322A28;
+	--color-text-muted: #5D4A45;
 	
 	/* Sidebar */
-	--sidebar-bg: #1e293b;
-	--sidebar-bg-hover: #334155;
-	--sidebar-text: #f1f5f9;
+	--sidebar-bg: #B46A34;
+	--sidebar-bg-hover: #D9833B;
+	--sidebar-text: #ffffff;
 	--sidebar-width-collapsed: 70px;
 	--sidebar-width-expanded: 220px;
 	
@@ -35,4 +35,33 @@
 	/* Transições */
 	--transition-fast: 0.2s ease;
 	--transition-medium: 0.3s ease;
+}
+
+.dark-theme {
+	/* Tema Escuro */
+	--color-primary: #5A8AA8; 
+	--color-primary-light: #7AA5BF;
+	--color-secondary: #5D4A45; 
+	--color-accent: #5A8AA8; 
+	--color-danger: #ff6b6b;
+	--color-warning: #ffd166;
+	
+	/* Cores de fundo e texto */
+	--color-background: #322A28;
+	--color-background-alt: #3A312F;
+	--color-text: #F9F6F0;
+	--color-text-muted: #DDDDDD;
+	
+	/* Sidebar */
+	--sidebar-bg: #5D4A45;
+	--sidebar-bg-hover: #6E5B55;
+	--sidebar-text: #FADCB9;
+	
+	/* Sombras - ajustadas para o tema escuro */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+	
+	/* Bordas */
+	--border-color: rgba(255, 255, 255, 0.1);
 }

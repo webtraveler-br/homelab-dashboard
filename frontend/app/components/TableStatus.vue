@@ -95,10 +95,6 @@ onMounted(fetchPresence);
 	letter-spacing: 0.05em;
 }
 
-.status-table tbody tr {
-	background-color: white;
-}
-
 .status-table tbody tr:hover {
 	background-color: rgba(0, 0, 0, 0.02);
 }

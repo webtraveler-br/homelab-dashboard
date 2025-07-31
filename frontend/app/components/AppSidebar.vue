@@ -52,7 +52,10 @@ function onMouseLeave() {
 	background: var(--sidebar-bg);
 	color: var(--sidebar-text);
 	width: var(--sidebar-width-collapsed);
-	transition: width var(--transition-medium);
+	transition: width var(--transition-medium), 
+		    background var(--transition-medium),
+		    color var(--transition-medium),
+		    box-shadow var(--transition-medium);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -106,6 +109,7 @@ function onMouseLeave() {
 .sidebar-nav li {
 	display: flex;
 	align-items: center;
+    justify-content: center;
 	gap: calc(var(--spacing-unit) * 2);
 	cursor: pointer;
 	padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2.5);
@@ -128,6 +132,10 @@ function onMouseLeave() {
 	color: white;
 }
 
+.sidebar.expanded .sidebar-nav li {
+    justify-content: unset;
+}
+
 .nav-text {
 	font-weight: 500;
 	white-space: nowrap;
@@ -140,6 +148,6 @@ function onMouseLeave() {
 	align-items: center;
 	gap: calc(var(--spacing-unit) * 1.5);
 	opacity: 0.7;
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	border-top: 1px solid var(--border-color);
 }
 </style>

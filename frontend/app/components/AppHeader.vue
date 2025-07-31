@@ -3,7 +3,9 @@
 		<div class="header-content">
 			<h1 class="page-title">{{ title }}</h1>
 			<div class="header-actions">
-                <!-- Ainda sem funcionalidade, mas serão utilizados no futuro -->
+                <button class="theme-toggle" title="Alternar tema" @click="toggleTheme">
+                    <span class="material-icons">{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</span>
+                </button>
 				<span class="material-icons">notifications</span> 
 				<span class="material-icons">settings</span>
 			</div>
@@ -12,11 +14,20 @@
 </template>
 
 <script setup lang="ts">
+import { useTheme } from '@/composables/useTheme';
+import { onMounted } from 'vue';
+
 defineProps({
 	title: {
 		type: String,
 		default: 'HomeLab',
 	},
+});
+
+const { isDarkTheme, toggleTheme, initTheme } = useTheme();
+
+onMounted(() => {
+    initTheme();
 });
 </script>
 
@@ -46,6 +57,28 @@ defineProps({
 	display: flex;
 	align-items: center;
 	gap: calc(var(--spacing-unit) * 2);
+}
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    padding: calc(var(--spacing-unit) * 0.5);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: all var(--transition-fast);
+}
+
+.theme-toggle:hover {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.theme-toggle .material-icons {
+    font-size: 1.3rem;
 }
 
 .header-actions .material-icons {

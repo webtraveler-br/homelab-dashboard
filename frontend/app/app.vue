@@ -1,5 +1,5 @@
 <template>
-	<div class="dashboard">
+	<div class="dashboard no-theme">
 		<AppSidebar v-model:expanded="sidebarExpanded" />
 
 		<div class="content-wrapper" :class="{ 'sidebar-expanded': sidebarExpanded }">
@@ -14,12 +14,40 @@
 <script setup lang="ts">
 import '@/assets/css/global.css';
 import '@/assets/css/variables.css';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useNavigation } from '@/composables/useNavigation';
+import { useTheme } from '@/composables/useTheme';
+import { useHead } from '#app';
+
+// necessário para aplicar o tema antes da renderização
+// evitando um flash do tema branco ou da página sem estilo
+useHead({
+	script: [
+		{
+			innerHTML: `
+				(function() {
+				const savedTheme = localStorage.getItem('theme');
+				const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+				if ((savedTheme === 'dark') || (!savedTheme && prefersDark)) {
+					document.documentElement.classList.add('dark-theme');
+				}
+				var dash = document.querySelector('.dashboard.no-theme');
+				if (dash) dash.classList.remove('no-theme');
+				})();
+			`,
+			tagPriority: 'critical',
+		},
+	],
+});
 
 const sidebarExpanded = ref(false);
 const { getPageTitle } = useNavigation();
 const pageTitle = computed(() => getPageTitle());
+const { initTheme } = useTheme();
+
+onMounted(() => {
+	initTheme();
+});
 </script>
 
 <style scoped>
@@ -27,6 +55,10 @@ const pageTitle = computed(() => getPageTitle());
 	display: flex;
 	min-height: 100vh;
 	background-color: var(--color-background);
+}
+
+.dashboard.loading {
+	opacity: 0;
 }
 
 .content-wrapper {

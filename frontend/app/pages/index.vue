@@ -20,7 +20,7 @@
 			<div class="dashboard-card">
 				<div class="card-header">
 					<span class="material-icons">photo_camera</span>
-					<h3>Foto Recente</h3>
+					<h3>Inspiração para os temas</h3>
 				</div>
 				<div class="card-content">
 					<div class="cat-photo">
