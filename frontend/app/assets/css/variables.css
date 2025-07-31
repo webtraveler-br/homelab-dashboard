@@ -1,0 +1,38 @@
+:root {
+	/* Cores*/
+	--color-primary: #3b82f6; /* Azul vibrante */
+	--color-primary-light: #93c5fd;
+	--color-secondary: #10b981; /* Verde para sucesso/status */
+	--color-accent: #8b5cf6; /* Roxo para detalhes de destaque */
+	--color-danger: #ef4444;
+	--color-warning: #f59e0b;
+	
+	/* Cores de fundo e texto */
+	--color-background: #f9fafb;
+	--color-background-alt: #ffffff;
+	--color-text: #111827;
+	--color-text-muted: #6b7280;
+	
+	/* Sidebar */
+	--sidebar-bg: #1e293b;
+	--sidebar-bg-hover: #334155;
+	--sidebar-text: #f1f5f9;
+	--sidebar-width-collapsed: 70px;
+	--sidebar-width-expanded: 220px;
+	
+	/* Tamanhos e Espaçamentos */
+	--header-height: 64px;
+	--border-radius-sm: 6px;
+	--border-radius: 8px;
+	--border-radius-lg: 12px;
+	--spacing-unit: 8px;
+	
+	/* Sombras */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+	
+	/* Transições */
+	--transition-fast: 0.2s ease;
+	--transition-medium: 0.3s ease;
+}
