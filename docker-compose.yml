@@ -23,6 +23,9 @@ services:
         restart: always
         env_file:
             - .env
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
         ports:
             - '5672:5672'
             - '15672:15672'
@@ -58,12 +61,34 @@ services:
         depends_on:
             - mosquitto
             - postgres
+            - rabbitmq
+        user: '${HOST_UID}:${HOST_GID}'
         env_file:
             - .env
+        environment:
+            PYTHONPATH: /app/libs # necessário para importar as libs
         networks:
             - homelab_net
         volumes:
-            - ./cat_ingestor_logs:/app/logs
+            - ./logs:/app/logs
+            - ../homelab-gatos-iot/services/libs:/app/libs # melhor do que ter que alterar o diretório de build
+
+    analysis_agent_anomaly:
+        build: ../homelab-gatos-iot/services/analysis_agent_anomaly
+        container_name: analysis_agent_anomaly
+        depends_on:
+            - mosquitto
+            - rabbitmq
+        user: '${HOST_UID}:${HOST_GID}'
+        env_file:
+            - .env
+        environment:
+            PYTHONPATH: /app/libs
+        networks:
+            - homelab_net
+        volumes:
+            - ./logs:/app/logs
+            - ../homelab-gatos-iot/services/libs:/app/libs
 
     backend:
         build:
@@ -103,6 +128,7 @@ services:
         container_name: frontend
         depends_on:
             - backend
+        user: '${HOST_UID}:${HOST_GID}'
         env_file:
             - .env
         environment:
