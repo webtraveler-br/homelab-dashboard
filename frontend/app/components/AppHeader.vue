@@ -3,19 +3,25 @@
 		<div class="header-content">
 			<h1 class="page-title">{{ title }}</h1>
 			<div class="header-actions">
-                <button class="theme-toggle" title="Alternar tema" @click="toggleTheme">
-                    <span class="material-icons">{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</span>
-                </button>
-				<span class="material-icons">notifications</span> 
+				<button class="theme-toggle" title="Alternar tema" @click="toggleTheme">
+					<span class="material-icons">{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</span>
+				</button>
+				<button class="icon-button" title="Ver insights" @click="insightsStore.openModal()">
+					<span class="material-icons">notifications</span>
+				</button>
 				<span class="material-icons">settings</span>
 			</div>
 		</div>
 	</header>
+
+	<InsightsModal />
 </template>
 
 <script setup lang="ts">
 import { useTheme } from '@/composables/useTheme';
+import { useInsightsStore } from '@/stores/insights';
 import { onMounted } from 'vue';
+import InsightsModal from './InsightsModal.vue';
 
 defineProps({
 	title: {
@@ -25,9 +31,10 @@ defineProps({
 });
 
 const { isDarkTheme, toggleTheme, initTheme } = useTheme();
+const insightsStore = useInsightsStore();
 
 onMounted(() => {
-    initTheme();
+	initTheme();
 });
 </script>
 
@@ -60,25 +67,43 @@ onMounted(() => {
 }
 
 .theme-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-    border: none;
-    padding: calc(var(--spacing-unit) * 0.5);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    color: var(--color-text-muted);
-    transition: all var(--transition-fast);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: transparent;
+	border: none;
+	padding: calc(var(--spacing-unit) * 0.5);
+	border-radius: var(--border-radius);
+	cursor: pointer;
+	color: var(--color-text-muted);
+	transition: all var(--transition-fast);
 }
 
 .theme-toggle:hover {
-    background-color: var(--color-primary-light);
-    color: var(--color-primary);
+	background-color: var(--color-primary-light);
+	color: var(--color-primary);
 }
 
 .theme-toggle .material-icons {
-    font-size: 1.3rem;
+	font-size: 1.3rem;
+}
+
+.icon-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: transparent;
+	border: none;
+	padding: calc(var(--spacing-unit) * 0.5);
+	border-radius: var(--border-radius);
+	cursor: pointer;
+	color: var(--color-text-muted);
+	transition: all var(--transition-fast);
+}
+
+.icon-button:hover {
+	background-color: var(--color-primary-light);
+	color: var(--color-primary);
 }
 
 .header-actions .material-icons {

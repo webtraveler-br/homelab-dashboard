@@ -98,22 +98,3 @@ export function useApi<T>() {
 	};
 }
 
-/**
- * Composable dedicado a sensores e monitoramento de gatos.
- */
-export function useSensorApi() {
-	const api = useApi();
-
-	/**
-	 * Busca o status de presença do gato na mesa.
-	 * @returns Status atual do gato (presente/ausente) ou null em caso de erro.
-	 */
-	async function getTablePresence() {
-		return api.fetch('status/table-presence');
-	}
-
-	return {
-		...api,
-		getTablePresence,
-	};
-}

@@ -30,11 +30,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useSensorApi } from '@/composables/useApi';
+import { useApiWrapper } from '@/composables/useApiWrapper';
 
 const status = ref('Carregando...');
 const timestamp = ref<string | null>(null);
-const sensorApi = useSensorApi();
+const { sensor } = useApiWrapper();
 
 function formatDate(dateStr: string) {
 	const d = new Date(dateStr);
@@ -44,7 +44,7 @@ function formatDate(dateStr: string) {
 async function fetchPresence() {
 	try {
 		status.value = 'Carregando...';
-		const data = await sensorApi.getTablePresence();
+	const data = await sensor.getTablePresence();
 		
 		if (data) {
 			status.value = data.status;
