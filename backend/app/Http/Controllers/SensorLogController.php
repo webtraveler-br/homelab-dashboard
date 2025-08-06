@@ -14,7 +14,7 @@ class SensorLogController extends Controller
      */
     public function latestPresence()
     {
-        $log = SensorLog::where('topic', 'sensores/nodes/table_presence')
+        $log = SensorLog::where('topic', 'sensors/nodes/table_presence')
             ->orderByDesc('timestamp')
             ->first();
 
