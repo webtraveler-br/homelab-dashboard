@@ -90,6 +90,24 @@ services:
             - ./logs:/app/logs
             - ../homelab-gatos-iot/services/libs:/app/libs
 
+    command_gateway:
+        build: ../homelab-gatos-iot/services/command_gateway
+        container_name: command_gateway
+        depends_on:
+            - mosquitto
+        user: '${HOST_UID}:${HOST_GID}'
+        env_file:
+            - .env
+        environment:
+            PYTHONPATH: /app/libs
+        ports:
+            - '5000:5000'
+        networks:
+            - homelab_net
+        volumes:
+            - ./logs:/app/logs
+            - ../homelab-gatos-iot/services/libs:/app/libs
+
     backend:
         build:
             context: ./backend
