@@ -7,3 +7,6 @@ Route::get('/status/table-presence', [App\Http\Controllers\SensorLogController::
 
 // Rota para os últimos insights
 Route::get('/insights/latest', [App\Http\Controllers\InsightController::class, 'latestInsights']);
+
+// Rota para comando buzzer
+Route::post('/commands/buzzer', [App\Http\Controllers\CommandController::class, 'buzzer']);
