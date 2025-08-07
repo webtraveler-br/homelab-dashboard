@@ -34,5 +34,5 @@ EXPOSE 8000
 
 USER $HOST_UID
 
-# CMD: exibe variáveis de ambiente relevantes e inicia o serviço
-CMD ["sh", "-c", "echo \"APP_ENV=$APP_ENV\"; echo \"DB_CONNECTION=$DB_CONNECTION\"; echo \"DB_HOST=$DB_HOST\"; echo \"DB_PORT=$DB_PORT\"; echo \"DB_DATABASE=$DB_DATABASE\"; echo \"DB_USERNAME=$DB_USERNAME\"; echo \"DB_PASSWORD=$DB_PASSWORD\"; if [ \"$APP_ENV\" = \"development\" ]; then php artisan serve --host=0.0.0.0 --port=8000; else php-fpm; fi"]
+# CMD: inicia o serviço
+CMD ["sh", "-c", "if [ \"$APP_ENV\" = \"development\" ]; then php artisan serve --host=0.0.0.0 --port=8000; else php-fpm; fi"]
