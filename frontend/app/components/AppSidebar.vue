@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { useNavigation } from '@/composables/useNavigation';
+import { useRouteStore } from '@/stores/route';
 
 const props = defineProps({
 	expanded: {
@@ -30,12 +30,10 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:expanded']);
-const { isActive, goTo } = useNavigation();
+const routeStore = useRouteStore();
+const { isActive, goTo } = routeStore;
 
-const navItems = [
-	{ name: 'index', icon: 'home', label: 'Dashboard' },
-	{ name: 'gatos', icon: 'pets', label: 'Monitoramento' },
-];
+const navItems = routeStore.routes;
 
 function onMouseEnter() {
 	emit('update:expanded', true);
@@ -53,9 +51,9 @@ function onMouseLeave() {
 	color: var(--sidebar-text);
 	width: var(--sidebar-width-collapsed);
 	transition: width var(--transition-medium), 
-		    background var(--transition-medium),
-		    color var(--transition-medium),
-		    box-shadow var(--transition-medium);
+			background var(--transition-medium),
+			color var(--transition-medium),
+			box-shadow var(--transition-medium);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -109,7 +107,7 @@ function onMouseLeave() {
 .sidebar-nav li {
 	display: flex;
 	align-items: center;
-    justify-content: center;
+	justify-content: center;
 	gap: calc(var(--spacing-unit) * 2);
 	cursor: pointer;
 	padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2.5);
@@ -133,7 +131,7 @@ function onMouseLeave() {
 }
 
 .sidebar.expanded .sidebar-nav li {
-    justify-content: unset;
+	justify-content: unset;
 }
 
 .nav-text {

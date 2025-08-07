@@ -14,8 +14,8 @@
 <script setup lang="ts">
 import '@/assets/css/global.css';
 import '@/assets/css/variables.css';
-import { ref, computed, onMounted } from 'vue';
-import { useNavigation } from '@/composables/useNavigation';
+import { ref, onMounted } from 'vue';
+import { useRouteStore } from '@/stores/route';
 import { useTheme } from '@/composables/useTheme';
 import { useHead } from '#app';
 
@@ -41,8 +41,8 @@ useHead({
 });
 
 const sidebarExpanded = ref(false);
-const { getPageTitle } = useNavigation();
-const pageTitle = computed(() => getPageTitle());
+const routeStore = useRouteStore();
+const pageTitle = routeStore.getPageTitle();
 const { initTheme } = useTheme();
 
 onMounted(() => {

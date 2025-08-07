@@ -13,7 +13,7 @@
 				</div>
 				<div class="card-content">
 					<p>Monitore a presença dos seus gatos em tempo real.</p>
-					<button class="btn btn-primary" @click="$router.push('/gatos')">Ver Monitoramento</button>
+					<button class="btn btn-primary" @click="routeStore.goTo('table')">Ver Monitoramento</button>
 				</div>
 			</div>
 
@@ -33,7 +33,8 @@
 </template>
 
 <script setup lang="ts">
-// Página inicial: Dashboard com cards e informações
+import { useRouteStore } from '@/stores/route';
+const routeStore = useRouteStore();
 </script>
 
 <style scoped>
