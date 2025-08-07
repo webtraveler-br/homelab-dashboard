@@ -22,6 +22,7 @@ class SensorLogController extends Controller
 
         return response()->json([
             'status' => $presence ? 'Gato Detectado!' : 'Sem gato',
+            'presence' => (bool) $presence,
             'timestamp' => $log ? $log->timestamp : null,
         ]);
     }
