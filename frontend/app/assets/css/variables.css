@@ -1,67 +1,91 @@
 :root {
 	/* Tema padrão: Claro */
-	--color-primary: #D9833B; 
-	--color-primary-light: #FADCB9;
-	--color-secondary: #B46A34; 
-	--color-accent: #D9833B; 
+	--color-primary: #d9833b;
+	--color-primary-light: #fadcb9;
+	--color-secondary: #b46a34;
+	--color-accent: #d9833b;
 	--color-danger: #ef4444;
 	--color-warning: #f59e0b;
-	
+
 	/* Cores de fundo e texto */
-	--color-background: #F9F6F0;
+	--color-background: #f9f6f0;
 	--color-background-alt: #ffffff;
-	--color-text: #322A28;
-	--color-text-muted: #5D4A45;
-	
+	--color-text: #322a28;
+	--color-text-muted: #5d4a45;
+
 	/* Sidebar */
-	--sidebar-bg: #B46A34;
-	--sidebar-bg-hover: #D9833B;
+	--sidebar-bg: #b46a34;
+	--sidebar-bg-hover: #d9833b;
 	--sidebar-text: #ffffff;
 	--sidebar-width-collapsed: 70px;
 	--sidebar-width-expanded: 220px;
-	
+
 	/* Tamanhos e Espaçamentos */
 	--header-height: 64px;
 	--border-radius-sm: 6px;
 	--border-radius: 8px;
 	--border-radius-lg: 12px;
 	--spacing-unit: 8px;
-	
+
 	/* Sombras */
 	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
 	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-	
+
 	/* Transições */
 	--transition-fast: 0.2s ease;
 	--transition-medium: 0.3s ease;
+
+	/* Notificações */
+	--toast-bg-info: #eff6ff;
+	--toast-color-info: #1e40af;
+	--toast-border-info: var(--color-primary);
+	--toast-bg-success: #ecfdf5;
+	--toast-color-success: #065f46;
+	--toast-border-success: var(--color-secondary);
+	--toast-bg-error: #fef2f2;
+	--toast-color-error: #991b1b;
+	--toast-border-error: var(--color-danger);
+	--toast-bg-warning: #fffbeb;
+	--toast-color-warning: #92400e;
+	--toast-border-warning: var(--color-warning);
 }
 
 .dark-theme {
 	/* Tema Escuro */
-	--color-primary: #5A8AA8; 
-	--color-primary-light: #7AA5BF;
-	--color-secondary: #5D4A45; 
-	--color-accent: #5A8AA8; 
+	--color-primary: #5a8aa8;
+	--color-primary-light: #7aa5bf;
+	--color-secondary: #5d4a45;
+	--color-accent: #5a8aa8;
 	--color-danger: #ff6b6b;
 	--color-warning: #ffd166;
-	
+
 	/* Cores de fundo e texto */
-	--color-background: #322A28;
-	--color-background-alt: #3A312F;
-	--color-text: #F9F6F0;
-	--color-text-muted: #DDDDDD;
-	
+	--color-background: #322a28;
+	--color-background-alt: #3a312f;
+	--color-text: #f9f6f0;
+	--color-text-muted: #dddddd;
+
 	/* Sidebar */
-	--sidebar-bg: #5D4A45;
-	--sidebar-bg-hover: #6E5B55;
-	--sidebar-text: #FADCB9;
-	
-	/* Sombras - ajustadas para o tema escuro */
+	--sidebar-bg: #5d4a45;
+	--sidebar-bg-hover: #6e5b55;
+	--sidebar-text: #fadcb9;
+
+	/* Sombras */
 	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
 	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
 	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-	
+
 	/* Bordas */
 	--border-color: rgba(255, 255, 255, 0.1);
+
+	/* Notificações */
+	--toast-bg-info: rgba(90, 138, 168, 0.15);
+	--toast-color-info: #eff6ff;
+	--toast-bg-success: rgba(16, 185, 129, 0.15);
+	--toast-color-success: #ecfdf5;
+	--toast-bg-error: rgba(239, 68, 68, 0.15);
+	--toast-color-error: #fef2f2;
+	--toast-bg-warning: rgba(245, 158, 11, 0.15);
+	--toast-color-warning: #fffbeb;
 }
