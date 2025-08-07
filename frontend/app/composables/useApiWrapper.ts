@@ -14,6 +14,13 @@ export function useApiWrapper() {
 	}
 
 	/**
+	 * Ativa o buzzer para espantar o gato.
+	 */
+	async function setBuzzer() {
+		return sensorApi.post('commands/buzzer', {});
+	}
+
+	/**
 	 * Busca os últimos insights do sistema.
 	 */
 	const insightsApi = useApi<Insight[]>();
@@ -25,6 +32,7 @@ export function useApiWrapper() {
 		sensor: {
 			...sensorApi,
 			getTablePresence,
+			setBuzzer,
 		},
 		insights: {
 			...insightsApi,
