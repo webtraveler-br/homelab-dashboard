@@ -1,24 +1,33 @@
 import { ref } from 'vue';
 
+// Estado compartilhado (mesmo ref para o todo o site)
+const isDarkTheme = ref(false);
+
+function applyThemeClass(dark: boolean) {
+	if (typeof window === 'undefined') return;
+	const root = document.documentElement;
+	root.classList.toggle('dark-theme', dark);
+}
+
+function setTheme(theme: 'dark' | 'light') {
+	const dark = theme === 'dark';
+	applyThemeClass(dark); // importante aplicar a classe antes
+	isDarkTheme.value = dark;
+	if (typeof window !== 'undefined') {
+		localStorage.setItem('theme', dark ? 'dark' : 'light');
+	}
+}
+
 export function useTheme() {
-	const isDarkTheme = ref(false);
-
-	// Função para alternar entre os temas
 	function toggleTheme() {
-		isDarkTheme.value = !isDarkTheme.value;
-
-		if (isDarkTheme.value) {
-			document.documentElement.classList.add('dark-theme');
-		} else {
-			document.documentElement.classList.remove('dark-theme');
-		}
-
-		localStorage.setItem('theme', isDarkTheme.value ? 'dark' : 'light');
+		setTheme(isDarkTheme.value ? 'light' : 'dark');
 	}
 
 	// Sincroniza o estado com a classe no document.documentElement
 	function initTheme() {
-		isDarkTheme.value = document.documentElement.classList.contains('dark-theme');
+		if (typeof window === 'undefined') return;
+		const isDark = document.documentElement.classList.contains('dark-theme');
+		isDarkTheme.value = isDark;
 	}
 
 	return {
