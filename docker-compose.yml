@@ -90,6 +90,23 @@ services:
             - ./logs:/app/logs
             - ../homelab-gatos-iot/services/libs:/app/libs
 
+    analysis_agent_water:
+        build: ../homelab-gatos-iot/services/analysis_agent_water
+        container_name: analysis_agent_water
+        depends_on:
+            - mosquitto
+            - rabbitmq
+        user: '${HOST_UID}:${HOST_GID}'
+        env_file:
+            - .env
+        environment:
+            PYTHONPATH: /app/libs
+        networks:
+            - homelab_net
+        volumes:
+            - ./logs:/app/logs
+            - ../homelab-gatos-iot/services/libs:/app/libs
+
     command_gateway:
         build: ../homelab-gatos-iot/services/command_gateway
         container_name: command_gateway
