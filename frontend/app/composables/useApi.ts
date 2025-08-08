@@ -47,6 +47,27 @@ export function useApi<T>() {
 	}
 
 	/**
+	 * Realiza uma requisição GET com parâmetros na URL.
+	 * @param endpoint Caminho do endpoint (ex: 'status/table-presence')
+	 * @param params Objeto com os parâmetros da query string
+	 * @param options Opções extras para o fetch
+	 * @returns Os dados retornados pela API ou null em caso de erro.
+	 */
+	async function get(endpoint: string, params?: Record<string, any>) {
+		let url = endpoint;
+		if (params && Object.keys(params).length > 0) {
+			const searchParams = new URLSearchParams();
+			Object.entries(params).forEach(([key, value]) => {
+				if (value !== undefined && value !== null) {
+					searchParams.append(key, String(value));
+				}
+			});
+			url += `?${searchParams.toString()}`;
+		}
+		return fetch(url);
+	}
+
+	/**
 	 * Envia dados para um endpoint da API usando POST.
 	 * @param endpoint Caminho do endpoint (ex: 'cat-logs')
 	 * @param data Objeto com os dados a serem enviados
@@ -92,9 +113,9 @@ export function useApi<T>() {
 	return {
 		...state.value,
 		fetch,
+		get,
 		post,
 		put,
 		remove,
 	};
 }
-

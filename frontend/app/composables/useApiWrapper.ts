@@ -21,6 +21,20 @@ export function useApiWrapper() {
 	}
 
 	/**
+	 * Busca logs de qualidade do ar entre dois períodos
+	 */
+	async function getAirQualityLogs(start: string, end: string) {
+		return sensorApi.get('logs/air-quality', { start, end });
+	}
+
+	/**
+	 * Busca logs de nível de água entre dois períodos
+	 */
+	async function getWaterLevelLogs(start: string, end: string) {
+		return sensorApi.get('logs/water-level', { start, end });
+	}
+
+	/**
 	 * Busca os últimos insights do sistema.
 	 */
 	const insightsApi = useApi<Insight[]>();
@@ -33,6 +47,8 @@ export function useApiWrapper() {
 			...sensorApi,
 			getTablePresence,
 			setBuzzer,
+			getAirQualityLogs,
+			getWaterLevelLogs,
 		},
 		insights: {
 			...insightsApi,
