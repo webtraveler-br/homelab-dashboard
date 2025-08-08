@@ -26,4 +26,48 @@ class SensorLogController extends Controller
             'timestamp' => $log ? $log->timestamp : null,
         ]);
     }
+
+    /**
+     * Retorna os logs de toxicidade (air_quality) entre dois períodos.
+     * GET /logs/air-quality?start=YYYY-MM-DDTHH:MM:SS&end=YYYY-MM-DDTHH:MM:SS
+     */
+    public function airQualityLogs(Request $request)
+    {
+        $validated = $request->validate([
+            'start' => ['required', 'date_format:Y-m-d\TH:i:s'],
+            'end' => ['required', 'date_format:Y-m-d\TH:i:s'],
+        ]);
+
+        $start = $validated['start'];
+        $end = $validated['end'];
+
+        $logs = SensorLog::where('topic', 'sensors/nodes/air_quality')
+            ->whereBetween('timestamp', [$start, $end])
+            ->orderBy('timestamp')
+            ->get();
+
+        return response()->json($logs);
+    }
+
+    /**
+     * Retorna os logs de nível de água (distância em cm) entre dois períodos.
+     * GET /logs/water-level?start=YYYY-MM-DDTHH:MM:SS&end=YYYY-MM-DDTHH:MM:SS
+     */
+    public function waterLevelLogs(Request $request)
+    {
+        $validated = $request->validate([
+            'start' => ['required', 'date_format:Y-m-d\TH:i:s'],
+            'end' => ['required', 'date_format:Y-m-d\TH:i:s'],
+        ]);
+
+        $start = $validated['start'];
+        $end = $validated['end'];
+
+        $logs = SensorLog::where('topic', 'sensors/nodes/water_level')
+            ->whereBetween('timestamp', [$start, $end])
+            ->orderBy('timestamp')
+            ->get();
+
+        return response()->json($logs);
+    }
 }

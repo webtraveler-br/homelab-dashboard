@@ -10,3 +10,9 @@ Route::get('/insights/latest', [App\Http\Controllers\InsightController::class, '
 
 // Rota para comando buzzer
 Route::post('/commands/buzzer', [App\Http\Controllers\CommandController::class, 'buzzer']);
+
+// Rota para logs de toxicidade (air_quality)
+Route::get('/logs/air-quality', [App\Http\Controllers\SensorLogController::class, 'airQualityLogs']);
+
+// Rota para logs de nível de água
+Route::get('/logs/water-level', [App\Http\Controllers\SensorLogController::class, 'waterLevelLogs']);
