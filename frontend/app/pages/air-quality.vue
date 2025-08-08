@@ -1,0 +1,281 @@
+<template>
+	<div class="dashboard-content">
+		<div class="welcome-header">
+			<h2>Qualidade do Ar</h2>
+			<p class="subtitle">Monitore os níveis de toxicidade do ar ao longo do tempo</p>
+		</div>
+
+		<div class="dashboard-grid">
+			<div class="dashboard-card">
+				<div class="card-header">
+					<span class="material-icons">timeline</span>
+					<h3>Período</h3>
+				</div>
+				<div class="card-content period-selector">
+					<button v-for="period in periods" :key="period.value" class="btn" :class="{ 'btn-primary': selectedPeriod === period.value }" @click="selectPeriod(period.value)">
+						{{ period.label }}
+					</button>
+				</div>
+			</div>
+
+			<div class="dashboard-card chart-card">
+				<div class="card-header">
+					<span class="material-icons">air</span>
+					<h3>Níveis de Toxicidade</h3>
+				</div>
+				<div class="card-content chart-container" :class="{ loading: isLoading }">
+					<div v-if="isLoading" class="loading-spinner">
+						<span class="material-icons rotating">sync</span>
+						<p>Carregando dados...</p>
+					</div>
+					<div v-else-if="error" class="error-message">
+						<span class="material-icons">error_outline</span>
+						<p>{{ error }}</p>
+					</div>
+					<div v-else-if="logs.length === 0" class="no-data">
+						<span class="material-icons">info</span>
+						<p>Nenhum dado disponível para este período</p>
+					</div>
+					<div v-else>
+						<div class="chart-wrapper">
+							<ThemedLineChart :key="themeKey" :labels="logs.map((l) => formatDisplayDate(l.timestamp))" :values="logs.map((l) => Number(l.payload.toxicity))" series-label="Toxicidade" y-title="Nível de Toxicidade" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue';
+import ThemedLineChart from '@/components/ThemedLineChart.vue';
+import { useToast } from '@/composables/useToast';
+import { useTheme } from '@/composables/useTheme';
+import { useApiWrapper } from '@/composables/useApiWrapper';
+
+const { isDarkTheme } = useTheme();
+const themeKey = computed(() => (isDarkTheme.value ? 'dark' : 'light'));
+
+const toast = useToast();
+
+interface SensorLog {
+	id: number;
+	timestamp: string;
+	topic: string;
+	payload: {
+		toxicity: number;
+		[key: string]: unknown;
+	};
+}
+
+const logs = ref<SensorLog[]>([]);
+const isLoading = ref(false);
+const error = ref('');
+const selectedPeriod = ref('day');
+
+const { sensor } = useApiWrapper();
+
+interface Period {
+	label: string;
+	value: string;
+}
+
+// Períodos disponíveis
+const periods: Period[] = [
+	{ label: 'Último Dia', value: 'day' },
+	{ label: 'Última Semana', value: 'week' },
+	{ label: 'Último Mês', value: 'month' },
+];
+
+const formatDate = (date: Date): string => {
+	const isoString = date.toISOString();
+	return isoString.split('.')[0] || isoString;
+};
+
+const getDateRange = (period: string): { start: string; end: string } => {
+	const end = new Date();
+	const start = new Date();
+
+	switch (period) {
+		case 'day':
+			start.setDate(start.getDate() - 1);
+			break;
+		case 'week':
+			start.setDate(start.getDate() - 7);
+			break;
+		case 'month':
+			start.setMonth(start.getMonth() - 1);
+			break;
+		default:
+			start.setDate(start.getDate() - 1);
+	}
+
+	return { start: formatDate(start), end: formatDate(end) };
+};
+
+// Funções para formatar data
+const formatDisplayDate = (dateString: string): string => {
+	const date = new Date(dateString);
+	return new Intl.DateTimeFormat('pt-BR', {
+		day: '2-digit',
+		month: '2-digit',
+		hour: '2-digit',
+		minute: '2-digit',
+	}).format(date);
+};
+
+const loadData = async () => {
+	isLoading.value = true;
+	error.value = '';
+
+	try {
+		const { start, end } = getDateRange(selectedPeriod.value);
+		const resp = await sensor.getAirQualityLogs(start, end);
+		logs.value = Array.isArray(resp) ? resp : [];
+	} catch (e) {
+		const err = e as Error;
+		error.value = err.message || 'Erro ao carregar dados';
+		toast.error('Falha ao carregar dados de qualidade do ar');
+	} finally {
+		isLoading.value = false;
+	}
+};
+
+const selectPeriod = (period: string) => {
+	selectedPeriod.value = period;
+	loadData();
+};
+
+onMounted(() => {
+	loadData();
+});
+</script>
+
+<style scoped>
+.dashboard-content {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 var(--spacing-unit);
+}
+
+.welcome-header {
+	margin-bottom: calc(var(--spacing-unit) * 3);
+	text-align: center;
+}
+
+.dashboard-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: calc(var(--spacing-unit) * 3);
+	margin-bottom: calc(var(--spacing-unit) * 4);
+}
+
+.dashboard-card {
+	background-color: var(--color-background-alt);
+	border-radius: var(--border-radius);
+	box-shadow: var(--shadow-md);
+	overflow: hidden;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-header {
+	display: flex;
+	align-items: center;
+	padding: calc(var(--spacing-unit) * 2);
+	background-color: var(--color-primary);
+	color: #fff;
+}
+
+.card-header h3 {
+	margin: 0 0 0 calc(var(--spacing-unit) * 1.5);
+	font-size: 1.2rem;
+}
+
+.card-header .material-icons {
+	font-size: 1.5rem;
+}
+
+.card-content {
+	padding: calc(var(--spacing-unit) * 2);
+}
+
+.period-selector {
+	display: flex;
+	gap: calc(var(--spacing-unit) * 1.5);
+	flex-wrap: wrap;
+}
+
+.chart-card {
+	min-height: 650px;
+}
+
+.chart-container {
+	height: 600px;
+	position: relative;
+	padding: calc(var(--spacing-unit) * 2);
+	background-color: var(--chart-bg);
+	border-radius: var(--border-radius);
+	box-shadow: var(--shadow-md);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner,
+.error-message,
+.no-data {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: var(--chart-text);
+	background-color: var(--chart-bg);
+}
+
+.rotating {
+	animation: rotate 1.5s linear infinite;
+}
+
+@keyframes rotate {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.btn {
+	padding: calc(var(--spacing-unit)) calc(var(--spacing-unit) * 2);
+	border: none;
+	border-radius: var(--border-radius-sm);
+	background-color: var(--color-background);
+	color: var(--color-text);
+	cursor: pointer;
+	font-weight: 500;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn:hover {
+	background-color: var(--color-primary-light);
+}
+
+.btn-primary {
+	background-color: var(--color-primary);
+	color: #fff;
+}
+
+.chart-wrapper {
+	height: 100%;
+	width: 100%;
+	min-height: 550px;
+	background-color: var(--chart-bg);
+}
+
+/* Responsividade */
+@media (min-width: 768px) {
+	.period-selector {
+		justify-content: center;
+	}
+}
+</style>

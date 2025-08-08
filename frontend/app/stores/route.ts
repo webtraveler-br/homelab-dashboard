@@ -10,8 +10,10 @@ export interface RouteInfo {
 }
 
 const routes: Record<string, RouteInfo> = {
-	index: { name: 'index', icon: 'home', label: 'Dashboard', title: 'Dashboard HomeLab' },
-	table: { name: 'table', icon: 'pets', label: 'Monitoramento', title: 'Monitoramento de Gatos' },
+	'index': { name: 'index', icon: 'home', label: 'Dashboard', title: 'Dashboard HomeLab' },
+	'table': { name: 'table', icon: 'pets', label: 'Presença', title: 'Monitoramento de Gatos na Mesa' },
+	'air-quality': { name: 'air-quality', icon: 'air', label: 'Qualidade do Ar', title: 'Monitoramento de Qualidade do Ar' },
+	'water-level': { name: 'water-level', icon: 'water_drop', label: 'Nível de Água', title: 'Monitoramento de Nível de Água' },
 };
 
 // Centraliza navegação e informações das rotas
