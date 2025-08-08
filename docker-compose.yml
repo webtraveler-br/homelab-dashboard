@@ -1,0 +1,187 @@
+services:
+    postgres:
+        image: postgres:15
+        container_name: postgres
+        restart: always
+        env_file:
+            - .env
+        ports:
+            - '5432:5432'
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        networks:
+            - homelab_net
+
+    rabbitmq:
+        image: rabbitmq:3-management
+        container_name: rabbitmq
+        restart: always
+        env_file:
+            - .env
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        healthcheck:
+            test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        networks:
+            - homelab_net
+
+    mosquitto:
+        image: eclipse-mosquitto:2
+        container_name: mosquitto
+        restart: always
+        ports:
+            - '1883:1883'
+            - '9001:9001'
+        healthcheck:
+            test: ['CMD-SHELL', 'mosquitto_sub -h localhost -t healthcheck -C 1 -E || exit 1']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        volumes:
+            - mosquitto_data:/mosquitto/data
+            - ./mosquitto/config:/mosquitto/config
+        networks:
+            - homelab_net
+
+    cat_ingestor:
+        build: ../homelab-gatos-iot/services/cat_ingestor
+        container_name: cat_ingestor
+        depends_on:
+            - mosquitto
+            - postgres
+            - rabbitmq
+        user: '${HOST_UID}:${HOST_GID}'
+        env_file:
+            - .env
+        environment:
+            PYTHONPATH: /app/libs # necessário para importar as libs
+        networks:
+            - homelab_net
+        volumes:
+            - ./logs:/app/logs
+            - ../homelab-gatos-iot/services/libs:/app/libs # melhor do que ter que alterar o diretório de build
+
+    analysis_agent_anomaly:
+        build: ../homelab-gatos-iot/services/analysis_agent_anomaly
+        container_name: analysis_agent_anomaly
+        depends_on:
+            - mosquitto
+            - rabbitmq
+        user: '${HOST_UID}:${HOST_GID}'
+        env_file:
+            - .env
+        environment:
+            PYTHONPATH: /app/libs
+        networks:
+            - homelab_net
+        volumes:
+            - ./logs:/app/logs
+            - ../homelab-gatos-iot/services/libs:/app/libs
+
+    analysis_agent_water:
+        build: ../homelab-gatos-iot/services/analysis_agent_water
+        container_name: analysis_agent_water
+        depends_on:
+            - mosquitto
+            - rabbitmq
+        user: '${HOST_UID}:${HOST_GID}'
+        env_file:
+            - .env
+        environment:
+            PYTHONPATH: /app/libs
+        networks:
+            - homelab_net
+        volumes:
+            - ./logs:/app/logs
+            - ../homelab-gatos-iot/services/libs:/app/libs
+
+    command_gateway:
+        build: ../homelab-gatos-iot/services/command_gateway
+        container_name: command_gateway
+        depends_on:
+            - mosquitto
+        user: '${HOST_UID}:${HOST_GID}'
+        env_file:
+            - .env
+        environment:
+            PYTHONPATH: /app/libs
+        ports:
+            - '5000:5000'
+        networks:
+            - homelab_net
+        volumes:
+            - ./logs:/app/logs
+            - ../homelab-gatos-iot/services/libs:/app/libs
+
+    backend:
+        build:
+            context: ./backend
+            args:
+                APP_ENV: ${APP_ENV}
+                HOST_UID: ${HOST_UID}
+                HOST_GID: ${HOST_GID}
+        container_name: backend
+        depends_on:
+            - postgres
+            - rabbitmq
+        env_file:
+            - .env
+        environment:
+            APP_ENV: ${APP_ENV}
+            DB_CONNECTION: ${DB_CONNECTION}
+            DB_HOST: ${POSTGRES_HOST}
+            DB_PORT: ${POSTGRES_PORT}
+            DB_DATABASE: ${POSTGRES_DB}
+            DB_USERNAME: ${POSTGRES_USER}
+            DB_PASSWORD: ${POSTGRES_PASSWORD}
+        ports:
+            - '8000:8000'
+        networks:
+            - homelab_net
+        volumes:
+            - ./backend:/var/www/html
+
+    frontend:
+        build:
+            context: ./frontend
+            args:
+                APP_ENV: ${APP_ENV}
+                HOST_UID: ${HOST_UID}
+                HOST_GID: ${HOST_GID}
+        container_name: frontend
+        depends_on:
+            - backend
+        user: '${HOST_UID}:${HOST_GID}'
+        env_file:
+            - .env
+        environment:
+            APP_ENV: ${APP_ENV}
+            HOST: '0.0.0.0'
+            PORT: '8080'
+        ports:
+            - '8080:8080'
+        networks:
+            - homelab_net
+        volumes:
+            - ./frontend:/app
+
+volumes:
+    pgdata:
+    mosquitto_data:
+    mosquitto_config:
+
+networks:
+    homelab_net:
+        driver: bridge
