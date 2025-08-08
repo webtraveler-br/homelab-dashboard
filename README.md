@@ -16,59 +16,76 @@ Os diversos serviços comunicam-se de forma assíncrona através de brokers de m
 
 ```mermaid
 graph TD
-    subgraph "Hardware (Borda)"
-        A[Nós ESP32 com Sensores/Atuadores]
+    %% Define Styles
+    classDef dataflow fill:#e6f2ff,stroke:#b3d9ff,stroke-width:2px;
+    classDef commandflow fill:#ffe6e6,stroke:#ffb3b3,stroke-width:2px;
+    classDef hardware fill:#f0f0f0,stroke:#333,stroke-width:2px;
+    classDef backend fill:#fff2cc,stroke:#ffd966,stroke-width:2px;
+    classDef presentation fill:#e6fffa,stroke:#b3ffe6,stroke-width:2px;
+
+    %% Subgraphs
+    subgraph "Camada de Hardware"
+        direction LR
+        A[Nós ESP32 - Sensores/Atuadores]:::hardware
     end
 
-    subgraph "Plataforma Backend (Serviços em Docker)"
-        B((Broker MQTT Mosquitto))
-        C((Broker RabbitMQ))
-        D[(Banco de Dados PostgreSQL)]
+    subgraph "Camada Backend"
+        direction TB
 
-        E[cat_ingestor (Python)]
-        F[analysis_agent_anomaly (Python)]
-        G[analysis_agent_water (Python)]
-        L[command_gateway (Python)]
-        H[backend (API Laravel)]
-        I[soketi (WebSocket Server)]
+        subgraph "Mensageiros & Brokers"
+            direction LR
+            B((MQTT Mosquitto)):::backend
+            C((RabbitMQ)):::backend
+        end
+
+        subgraph "Processamento & Armazenamento de Dados"
+            direction LR
+            E[cat_ingestor]:::backend
+            D[(PostgreSQL DB)]:::backend
+        end
+
+        subgraph "Análise & Lógica"
+            direction LR
+            F[analysis_agent_anomaly]:::backend
+            G[analysis_agent_water]:::backend
+            L[command_gateway]:::backend
+        end
+
+        subgraph "API & Aplicação"
+            H[API Backend - Laravel]:::backend
+        end
     end
 
     subgraph "Camada de Apresentação"
-        J[frontend (Nuxt)]
-        K(Usuário Administrador)
+        direction LR
+        J[App Frontend - Nuxt]:::presentation
+        K(Usuário):::presentation
     end
 
-    %% FLUXO DE DADOS (SENSOR -> TELA)
-    A -- "1. Publica Dados Brutos via MQTT" --> B;
+    %% Fluxo de Dados (Azul)
+    A -- "1.Dados Brutos do Sensor" --> B;
+    B -- "2.Dados Brutos" --> E;
+    B -- "2.Dados Brutos" --> F;
+    B -- "2.Dados Brutos" --> G;
+    E -- "3.Persiste Dados Brutos" --> D;
+    F -- "4a.Insight de Toxicidade" --> C;
+    G -- "4b.Insight de Nível da Água" --> C;
+    C -- "5.Consome Insights" --> E;
+    E -- "6.Persiste Insights" --> D;
+    H -- "8.Consulta Dados/Insights" --> D;
+    J -- "7.Requisição HTTP" --> H;
+    J -- "9.Renderiza Dashboard" --> K;
 
-    B -- "2. Ouve Tópicos de Sensores" --> E;
-    B -- "2. Ouve Tópicos de Sensores" --> F;
-    B -- "2. Ouve Tópicos de Sensores" --> G;
+    %% Fluxo de Comando (Vermelho)
+    K -.->|"A. Aciona Ação"| J;
+    J -.->|"B. Comando POST"| H;
+    H -.->|"C. Chamada de API Interna"| L;
+    L -.->|"D. Publica Comando MQTT"| B;
+    B -.->|"E. Encaminha para o Nó"| A;
 
-    E -- "3. Persiste Dados Brutos" --> D;
-
-    F -- "4. Publica Insight de Anomalia" --> C;
-    G -- "4. Publica Insight de Nível da Água" --> C;
-
-    C -- "5. Ouve Fila de Insights" --> E;
-
-    E -- "6. Persiste Insight Processado" --> D;
-    E -- "7. Dispara Gatilho HTTP (Tempo Real)" --> H;
-
-    H -- "8. Transmite Evento via WebSocket" --> I;
-    I -- "9. Notificação Push" --> J;
-
-    J -- "10. Requisição HTTP (Dados Históricos)" --> H;
-    H -- "11. Consulta Banco de Dados" --> D;
-
-    J -- "12. Renderiza Dashboard para" --> K;
-
-    %% FLUXO DE COMANDO (ADMIN -> ATUADOR)
-    K -- "A. Aciona Comando na Interface" --> J;
-    J -- "B. Envia Requisição POST para API" --> H;
-    H -- "C. Faz Chamada HTTP Interna" --> L;
-    L -- "D. Publica Comando via MQTT" --> B;
-    B -- "E. Envia Comando para Nó Específico" --> A;
+    %% Aplica Estilos aos Links
+    linkStyle 0,1,2,3,4,5,6,7,8,9,10,11 stroke:#007bff,stroke-width:2px,color:blue;
+    linkStyle 12,13,14,15,16 stroke:#dc3545,stroke-width:2px,stroke-dasharray:5 5;
 ```
 
 ## Stack
@@ -151,6 +168,7 @@ COMMAND_GATEWAY_PORT=5000
 ```
 
 Para facilitar, também pode criar um arquivo make.
+
 1.  Na pasta raiz (`homelab/`), crie um arquivo `Makefile`.
 2.  Preencha da seguinte forma:
 
@@ -252,82 +270,3 @@ docker-compose up -d --build # ou make up
 -   **WebSockets:** Adicionar um serviço de websockets, conectar ao backend e permitir notificação de insights em tempo real.
 -   **Firmware e Serviço de localização:** Adicionar funcionalidade de identificar a localização dos gatos na casa através de uma coleira com BLE.
 -   **Autenticação:** Autenticação na plataforma.
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-graph TD
-%% Define Styles
-classDef dataflow fill:#e6f2ff,stroke:#b3d9ff,stroke-width:2px;
-classDef commandflow fill:#ffe6e6,stroke:#ffb3b3,stroke-width:2px;
-classDef hardware fill:#f0f0f0,stroke:#333,stroke-width:2px;
-classDef backend fill:#fff2cc,stroke:#ffd966,stroke-width:2px;
-classDef presentation fill:#e6fffa,stroke:#b3ffe6,stroke-width:2px;
-
-    %% Subgraphs
-    subgraph "Camada de Hardware"
-        direction LR
-        A[Nós ESP32 - Sensores/Atuadores]:::hardware
-    end
-
-    subgraph "Camada Backend"
-        direction TB
-
-        subgraph "Mensageiros & Brokers"
-            direction LR
-            B((MQTT Mosquitto)):::backend
-            C((RabbitMQ)):::backend
-        end
-
-        subgraph "Processamento & Armazenamento de Dados"
-            direction LR
-            E[cat_ingestor]:::backend
-            D[(PostgreSQL DB)]:::backend
-        end
-
-        subgraph "Análise & Lógica"
-            direction LR
-            F[analysis_agent_anomaly]:::backend
-            G[analysis_agent_water]:::backend
-            L[command_gateway]:::backend
-        end
-
-        subgraph "API & Aplicação"
-            H[API Backend - Laravel]:::backend
-        end
-    end
-
-    subgraph "Camada de Apresentação"
-        direction LR
-        J[App Frontend - Nuxt]:::presentation
-        K(Usuário):::presentation
-    end
-
-    %% Fluxo de Dados (Azul)
-    A -- "1.Dados Brutos do Sensor" --> B;
-    B -- "2.Dados Brutos" --> E;
-    B -- "2.Dados Brutos" --> F;
-    B -- "2.Dados Brutos" --> G;
-    E -- "3.Persiste Dados Brutos" --> D;
-    F -- "4a.Insight de Toxicidade" --> C;
-    G -- "4b.Insight de Nível da Água" --> C;
-    C -- "5.Consome Insights" --> E;
-    E -- "6.Persiste Insights" --> D;
-    H -- "8.Consulta Dados/Insights" --> D;
-    J -- "7.Requisição HTTP" --> H;
-    J -- "9.Renderiza Dashboard" --> K;
-
-    %% Fluxo de Comando (Vermelho)
-    K -.->|"A. Aciona Ação"| J;
-    J -.->|"B. Comando POST"| H;
-    H -.->|"C. Chamada de API Interna"| L;
-    L -.->|"D. Publica Comando MQTT"| B;
-    B -.->|"E. Encaminha para o Nó"| A;
-
-    %% Aplica Estilos aos Links
-    linkStyle 0,1,2,3,4,5,6,7,8,9,10,11 stroke:#007bff,stroke-width:2px,color:blue;
-    linkStyle 12,13,14,15,16 stroke:#dc3545,stroke-width:2px,stroke-dasharray:5 5;
-
-```
-
-```
